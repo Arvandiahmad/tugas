@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Siswa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding: 20px; margin: 40px; }
+  </style>
+</head>
+<body style="background-color: rgb(255, 246, 232);">
+    <div class="container w-50 py-2 rounded-3 shadow" style="background-color: rgb(255, 255, 255);">
+        
+    <table class="table">
+        <h2 class="my-4" align="center">Detail Siswa</h2>
+        <div class="text-center">
+            <img id="foto" src ="" alt="Foto Siswa" width="130" height="130" class="">
+        </div>
+
+        <tr>
+            <th>ID Siswa</th>
+            <td id="id_siswa"></td>
+        </tr>
+        <tr>
+            <th>Nama Lengkap</th>
+            <td id="nama_lengkap"></td>
+        </tr>
+        <tr>
+            <th>Jenis Kelamin</th>
+            <td id="jenis_kelamin"></td>
+        </tr>
+        <tr>
+            <th>Tanggal Daftar</th>
+            <td id="tanggal_daftar"></td>
+        </tr>
+        <tr>
+            <th>Kelas</th>
+            <td id="kelas"></td>
+        </tr>
+        
+    </table>
+    <a href="index.html" class="btn btn-primary w-25">Kembali</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded",function(){
+            const urlParams = new URLSearchParams(window.location.search);
+            const id_siswa = urlParams.get("id");
+        
+        fetch(`/siswa/${id_siswa}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                
+                document.getElementById("foto").src = data[0].foto;
+                document.getElementById("id_siswa").textContent = data[0].id_siswa;
+                document.getElementById("nama_lengkap").textContent = data[0].nama_lengkap;
+                document.getElementById("jenis_kelamin").textContent = data[0].jenis_kelamin;
+                document.getElementById("tanggal_daftar").textContent = data[0].tanggal_daftar;
+                document.getElementById("kelas").textContent = data[0].kelas;
+            }
+        });
+    });
+    </script>
+</body>
+</html>

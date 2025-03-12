@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubah Data</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding: 20px; margin: 40px; }
+  </style>
+</head>
+<body style="background-color: rgb(232, 253, 255);">
+  <div class="container w-50 py-2 rounded-3 shadow" style="background-color: rgb(255, 255, 255);">
+    <table id="example" class="table table-striped" style="width:100%">
+    <h2 class="my-4" align="center">Ubah Data</h2>
+    <form id="formUpdate">
+      <div name="id_siswa" id="id_siswa" readonly></div>
+      
+      <div class="mb-3">
+        <label class="form-label">Upload Foto</label>
+        <img id="previewFoto" src="" alt="Foto Siswa" class="img-thumbnail mb-2" style="max-width: 150px; display: none;">
+        <input type="file" class="form-control" name="foto" id="foto">
+      </div>
+      
+      <div class="mb-3">
+        <label class="form-label">Nama Lengkap</label>
+        <input type="text" class="form-control" name="nama_lengkap" id="nama_lengkap" placeholder="Masukan Nama Lengkap">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Jenis Kelamin</label>
+        <select class="form-select" name="jenis_kelamin" id="jenis_kelamin" aria-label="Default select example">
+          <option selected disabled>Pilih Jenis Kelamin</option>
+          <option value="Laki-laki">Laki-laki</option>
+          <option value="Perempuan">Perempuan</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Tanggal Daftar</label>
+        <input type="date" class="form-control" name="tanggal_daftar" id="tanggal_daftar" placeholder="Masukan Tanggal Daftar">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Kelas</label>
+        <input type="text" class="form-control" name="kelas" id="kelas" placeholder=" Masukan Kelas">
+      </div>
+      <div>
+      <button type="submit" class="btn btn-success mb-3">Ubah</button>
+      <a href="index.html" class="btn btn-primary mb-3">Kembali</a>
+      </div>
+
+    </form>
+    </table>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id_siswa =urlParams.get("id");
+
+      if (!id_siswa){
+        alert("ID siswa tidak ditemukan");
+        return;
+      }
+
+      fetch(`/siswa/${id_siswa}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Gagal mengambil data siswa.");
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.length > 0) {
+      const siswa = data[0];
+      const tanggal = new Date(siswa.tanggal_daftar).toISOString().split("T")[0];
+
+      document.getElementById("id_siswa").value = siswa.id_siswa;
+      document.getElementById("nama_lengkap").value = siswa.nama_lengkap;
+      document.getElementById("jenis_kelamin").value = siswa.jenis_kelamin;
+      document.getElementById("tanggal_daftar").value = tanggal;
+      document.getElementById("kelas").value = siswa.kelas;
+
+      if (siswa.foto) {
+        const previewFoto = document.getElementById("previewFoto");
+        previewFoto.src = siswa.foto; 
+        previewFoto.style.display = "block";
+      }
+    }
+  })
+  .catch(error => {
+    alert("Terjadi kesalahan: " + error.message);
+  });
+
+
+      
+      document.getElementById("formUpdate").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const updateData = new FormData();
+        const fileInput = document.getElementById("foto").files[0];
+
+        if (fileInput) {
+          updateData.append("foto", fileInput);
+        }
+
+        updateData.append("nama_lengkap", document.getElementById("nama_lengkap").value);
+        updateData.append("jenis_kelamin", document.getElementById("jenis_kelamin").value);
+        updateData.append("tanggal_daftar", document.getElementById("tanggal_daftar").value);
+        updateData.append("kelas", document.getElementById("kelas").value);
+
+        fetch(`/siswa/${id_siswa}`, {
+          method: "PUT",
+          body: updateData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("gagal memperbarui data.");
+          }
+          return response.text();
+        })
+        .then(message => {
+          localStorage.setItem("succesMessage", "Data berhasil Diupdate");
+          window.location.href = "index.html";
+        })
+        .catch(error => {
+          alert("tejadi kesalahan: " + error.message);
+        });
+      });
+    });
+  </script>
+
+
+</body>
+</html>
